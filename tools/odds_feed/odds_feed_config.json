@@ -1,0 +1,15 @@
+{
+  "_about": "Which real events the game's sportsbook shows. The fetcher keeps an event when either team is on the watch list (local and regional teams), so a small, fixed number of games is shown and the API credits stay low. Edit the lists to change the book; no code changes needed.",
+  "sports": {
+    "baseball_mlb":           {"league": "Baseball",         "sport": "baseball"},
+    "basketball_nba":         {"league": "Basketball",       "sport": "basketball"},
+    "americanfootball_nfl":   {"league": "Football",         "sport": "football"},
+    "basketball_ncaab":       {"league": "College basketball", "sport": "basketball"},
+    "icehockey_nhl":          {"league": "Hockey",           "sport": "hockey"}
+  },
+  "watch": ["Milwaukee Brewers", "Milwaukee Bucks", "Green Bay Packers", "Wisconsin Badgers", "Marquette Golden Eagles", "Chicago Cubs", "Chicago Bulls", "Chicago Bears", "Chicago Blackhawks", "Minnesota Twins", "Minnesota Vikings", "Detroit Lions", "St. Louis Cardinals"],
+  "regions": "us",
+  "scores_days_from": 1,
+  "max_events": 24,
+  "stale_after_hours": 6
+}

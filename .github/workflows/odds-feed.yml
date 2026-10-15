@@ -1,0 +1,32 @@
+# Writes the real-games odds file the game's sportsbook reads (https://raw.githubusercontent.com/<this repo>/odds-data/odds.json).
+# Needs a repository secret ODDS_API_KEY (an account at https://the-odds-api.com). Without it this job does nothing and the game shows its simulated slate.
+# Each run replaces the single commit on the odds-data branch, so there is no history to grow. Credits: see tools/odds_feed/README.md.
+name: Odds feed
+on:
+  schedule:
+    - cron: "0 */6 * * *"      # every 6 hours: fits a free plan. Tighten (for example "*/20 15-23,0-4 * * *") with a paid plan for live odds
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: odds-feed
+  cancel-in-progress: false
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    env:
+      ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Self-test the fetcher
+        run: python3 tools/odds_feed/fetch_odds.py --self-test
+      - name: Fetch real games and odds
+        if: env.ODDS_API_KEY != ''
+        run: python3 tools/odds_feed/fetch_odds.py --out odds.json
+      - name: Publish odds.json to the odds-data branch
+        if: env.ODDS_API_KEY != ''
+        run: |
+          mkdir /tmp/pub && cp odds.json /tmp/pub/ && cd /tmp/pub
+          git init -q -b odds-data && git config user.name "odds-feed" && git config user.email "odds-feed@users.noreply.github.com"
+          git add odds.json && git commit -q -m "odds feed $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" odds-data
